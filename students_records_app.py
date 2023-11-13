@@ -66,6 +66,89 @@ def list_Students():
   for record in records:
     record_display.insert(END, f"PantherID: {record[0]}\nName: {record[1]}\nEmail:{record[2]}\n\n")
 
+# Function that will check whether studen record exists in student_record database 
+def is_Student(panId):
+
+    # counts if pantherid exists in database
+        # will be 0 or 1
+    cursor.execute('SELECT COUNT(1) from Students WHERE pantherid = ' + panId)
+    records = cursor.fetchone()
+    if records[0] == 0: # When record is not found
+        showinfo(message=f'No record was found for {panId}')
+        return False
+    return True
+
+# Function that will search for student record in student_record database 
+#   when 'Search Record' button is clicked
+def search_record():
+    try:
+        pantherid = pantherid_entry.get()
+        if is_Student(pantherid): # Checks that student record exists
+
+            # Selects database entries that matches the pantherid
+            cursor.execute('SELECT * from Students WHERE PantherID = ' + pantherid)
+            records = cursor.fetchall()
+
+            # Prints the record or records that match
+            for record in records:
+                txt.insert(END, f"PantherID: {record[0]}   Name: {record[1]}   Email: {record[2]}\n")
+            clear_entries()
+
+    except sqlite3.OperationalError: # Exception for when pantherid is not entered
+        showinfo(message='Please enter a PantherID to search for a record')
+
+# Function that will update student record in student_record database 
+#   when 'Update Record' button is clicked
+def update_record():
+    try:
+        pantherid = pantherid_entry.get()
+        name = name_entry.get()
+        email = email_entry.get()
+        if is_Student(pantherid): # Checks that student record exists
+
+            # Updates record using pantherid
+            cmd = 'UPDATE Students SET Name = ?, Email = ? WHERE PantherID = ?'
+            cursor.execute(cmd, (name, email, pantherid))
+
+    except sqlite3.OperationalError: # Exception for when pantherid is not entered
+        showinfo(message='Please enter a PantherID, Name, and Email to update a record')
+
+# Function that will delete student record in student_record database 
+#   when 'Delete Record' button is clicked
+def delete_record():
+    try:
+        pantherid = pantherid_entry.get()
+        if is_Student(pantherid): # Checks that student record exists
+            
+            # Deletes record using pantherid
+            cmd = 'DELETE from Students WHERE PantherID = ?'
+            cursor.execute(cmd, (pantherid))
+            showinfo(message='Record has been deleted')
+
+    except sqlite3.OperationalError: # Exception for when pantherid is not entered
+        showinfo(message='Please enter a PantherID to delete a record')
+
+# Function that will export student_record database to 'student_records_csv' file
+#   when 'Export to CSV' button is clicked
+def export_to_csv():
+    try:
+        infile = open('students.csv', 'w') # Creates or opens existing 'students' csv
+        writer = csv.writer(infile) # Creates a writer for csv
+
+        # Selects the the Students database and puts it in a list of tuples
+        cursor.execute('SELECT * from Students')
+        records = cursor.fetchall()
+
+        # Writes in rows in csv from database
+        for record in records:
+            writer.writerow(record)
+        infile.close()
+
+    except FileNotFoundError: # Exception for when file doesn't exist and won't create new file
+        infile = open('students.csv', 'x')
+        infile.close()
+        showinfo('Please press the Export to CSV button again')
+
 # Buttons for adding students to student_records database
 add_Button = Button(app, text="Add Student", command=add_Students)
 add_Button.grid(row=3, column=0, columnspan=2)
@@ -73,5 +156,22 @@ add_Button.grid(row=3, column=0, columnspan=2)
 # Button for listing students in student_records database
 list_Button = Button(app, text="List Students", command=list_Students)
 list_Button.grid(row=4, column=0, columnspan=2)
+
+# Button for searching for student record
+search_button = Button(master=app, text='Search Record', command=search_record)
+search_button.grid(row=3, column=1)
+
+# Button for updating a student record
+update_button = Button(master=app, text='Update Record', command=update_record)
+update_button.grid(row=3, column=2)
+
+# Button for deleting a student record
+delete_button = Button(master=app, text='Delete Record', command=delete_record)
+delete_button.grid(row=4, column=1)
+
+# Button for exporting student_records database 
+# to 'student_records_csv' csv file
+export_csv_button = Button(master=app, text='Export to CSV', command=export_to_csv)
+export_csv_button.grid(row=4, column=2)
 
 app.mainloop()
