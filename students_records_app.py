@@ -44,6 +44,18 @@ def clear_entries():
     name_entry.delete(0, END)
     email_entry.delete(0, END)
 
+# Function that will check whether student record exists in student_record database 
+def is_Student(panId):
+
+    # counts if pantherid exists in database
+        # will be 0 or 1
+    cursor.execute('SELECT COUNT(1) from Students WHERE pantherid = ' + panId)
+    records = cursor.fetchone()
+    if records[0] == 0: # When record is not found
+        showinfo(message=f'No record was found for {panId}')
+        return False
+    return True
+
 # Function that will add student to student_records database 
 #   when 'Add Student' button is clicked
 def add_Students():
@@ -73,18 +85,6 @@ def list_Students():
   record_display.insert(END, f'Student List as of {timestamp}\n')
   for record in records:
     record_display.insert(END, f"PantherID: {record[0]}\nName: {record[1]}\nEmail:{record[2]}\n\n")
-
-# Function that will check whether studen record exists in student_record database 
-def is_Student(panId):
-
-    # counts if pantherid exists in database
-        # will be 0 or 1
-    cursor.execute('SELECT COUNT(1) from Students WHERE pantherid = ' + panId)
-    records = cursor.fetchone()
-    if records[0] == 0: # When record is not found
-        showinfo(message=f'No record was found for {panId}')
-        return False
-    return True
 
 # Function that will search for student record in student_record database 
 #   when 'Search Record' button is clicked
