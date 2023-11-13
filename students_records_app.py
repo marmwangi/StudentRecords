@@ -2,6 +2,7 @@ from tkinter import Tk, Label, Entry, Button, Text, END, NORMAL, DISABLED, font
 import sqlite3
 from tkinter.messagebox import showinfo
 from datetime import datetime
+import csv
 
 # Creating student_records database
   # PantherID, Name, Email as columns
@@ -98,7 +99,7 @@ def search_record():
 
             # Prints the record or records that match
             for record in records:
-                txt.insert(END, f"PantherID: {record[0]}   Name: {record[1]}   Email: {record[2]}\n")
+                record_display.insert(END, f"PantherID: {record[0]}   Name: {record[1]}   Email: {record[2]}\n")
             clear_entries()
 
     except sqlite3.OperationalError: # Exception for when pantherid is not entered
