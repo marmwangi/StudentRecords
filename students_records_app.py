@@ -38,7 +38,6 @@ record_display = Text(app, height=10, width=50)
 record_display.grid(row=5, column=0, columnspan=2, pady=5)
 
 # Function that will clear entries for PantherID, Name, and Email 
-#   when 'Add Student' button is clicked
 def clear_entries():
     pantherid_entry.delete(0, END)
     name_entry.delete(0, END)
